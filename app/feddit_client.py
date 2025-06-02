@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 BASE_URL = "http://localhost:8080/api/v1"
 
 
-def get_subfeddit_id_by_name(name: str) -> str:
+async def get_subfeddit_id_by_name(name: str) -> str:
     """
     Retrieve the unique ID of a subfeddit given its title.
 
@@ -25,8 +25,9 @@ def get_subfeddit_id_by_name(name: str) -> str:
     logger.info(f"Fetching ID for subfeddit '{name}'")
 
     try:
-        response = httpx.get(url)
-        response.raise_for_status()
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url)
+            response.raise_for_status()
     except httpx.HTTPError as e:
         logger.exception(f"Failed to fetch subfeddits from Feddit: {e}")
         raise
@@ -42,7 +43,7 @@ def get_subfeddit_id_by_name(name: str) -> str:
     raise ValueError(f"Subfeddit '{name}' not found")
 
 
-def get_comments(subfeddit: str, limit: int = 25) -> list[dict]:
+async def get_comments(subfeddit: str, limit: int = 25) -> list[dict]:
     """
     Fetch the most recent comments for a given subfeddit by name.
 
@@ -58,14 +59,15 @@ def get_comments(subfeddit: str, limit: int = 25) -> list[dict]:
         httpx.HTTPStatusError: If the request to Feddit fails.
     """
     logger.info(f"Fetching comments for subfeddit '{subfeddit}' (limit={limit})")
-    subfeddit_id = get_subfeddit_id_by_name(subfeddit)
+    subfeddit_id = await get_subfeddit_id_by_name(subfeddit)
 
     url = f"{BASE_URL}/comments/"
     params = {"subfeddit_id": subfeddit_id, "skip": 0, "limit": limit}
 
     try:
-        response = httpx.get(url, params=params)
-        response.raise_for_status()
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, params=params)
+            response.raise_for_status()
     except httpx.HTTPError as e:
         logger.exception(
             f"Failed to fetch comments for subfeddit ID {subfeddit_id}: {e}"

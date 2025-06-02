@@ -13,7 +13,7 @@ app = FastAPI()
 
 
 @app.get("/comments/{subfeddit}")
-def comments(subfeddit: str):
+async def comments(subfeddit: str):
     """
     Get the most recent comments from a given subfeddit with sentiment classification.
 
@@ -32,7 +32,7 @@ def comments(subfeddit: str):
     logger.info(f"Received request for comments from subfeddit: '{subfeddit}'")
 
     try:
-        comments_data = get_comments(subfeddit=subfeddit)
+        comments_data = await get_comments(subfeddit=subfeddit)
         logger.info(f"Successfully retrieved comments for subfeddit: '{subfeddit}'")
         return comments_data
     except ValueError as ve:
