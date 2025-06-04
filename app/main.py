@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import FastAPI, HTTPException
+from fastapi import Query
 
 from app.feddit_client import get_comments
 from app.logging_config import setup_logging
@@ -13,7 +14,15 @@ app = FastAPI()
 
 
 @app.get("/comments/{subfeddit}")
-async def comments(subfeddit: str):
+async def comments(
+    subfeddit: str,
+    limit: int = Query(
+        25,
+        ge=1,
+        le=100,
+        description="Number of comments to retrieve (default: 25, max: 100)",
+    ),
+):
     """
     Get the most recent comments from a given subfeddit with sentiment classification.
 
@@ -32,7 +41,7 @@ async def comments(subfeddit: str):
     logger.info(f"Received request for comments from subfeddit: '{subfeddit}'")
 
     try:
-        comments_data = await get_comments(subfeddit=subfeddit)
+        comments_data = await get_comments(subfeddit=subfeddit, limit=limit)
         logger.info(f"Successfully retrieved comments for subfeddit: '{subfeddit}'")
         return comments_data
     except ValueError as ve:
