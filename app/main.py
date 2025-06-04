@@ -1,5 +1,6 @@
 import logging
 
+from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi import Query
 
@@ -22,6 +23,8 @@ async def comments(
         le=100,
         description="Number of comments to retrieve (default: 25, max: 100)",
     ),
+    start: datetime = Query(None, description="Start datetime in ISO 8601 format"),
+    end: datetime = Query(None, description="End datetime in ISO 8601 format"),
 ):
     """
     Retrieve a limited number of recent comments from a specific subfeddit,
@@ -30,9 +33,11 @@ async def comments(
     Args:
         subfeddit (str): Name of the subfeddit to query.
         limit (int): Maximum number of comments to retrieve (default: 25, max: 100).
+        start (datetime, optional): Only include comments created after this timestamp (inclusive).
+        end (datetime, optional): Only include comments created before this timestamp (inclusive).
 
     Returns:
-        List[dict]: A list of comments, each including:
+        list[dict]: A list of comments, each including:
             - id (str): Unique identifier of the comment
             - text (str): Content of the comment
             - polarity (float): Sentiment polarity score
@@ -40,14 +45,23 @@ async def comments(
 
     Raises:
         HTTPException:
-            404: If the subfeddit does not exist or returns no comments.
-            500: For any unexpected server error.
+            404: If the subfeddit does not exist or if no comments are found in the given time range.
+            500: For any unexpected internal server error.
     """
     logger.info(f"Received request for comments from subfeddit: '{subfeddit}'")
 
     try:
-        comments_data = await get_comments(subfeddit=subfeddit, limit=limit)
+        start_ts = int(start.timestamp()) if start else None
+        end_ts = int(end.timestamp()) if end else None
+
+        comments_data = await get_comments(
+            subfeddit=subfeddit,
+            limit=limit,
+            start=start_ts,
+            end=end_ts,
+        )
         logger.info(f"Successfully retrieved comments for subfeddit: '{subfeddit}'")
+
         return comments_data
     except ValueError as ve:
         logger.error(ve)
