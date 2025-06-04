@@ -1,32 +1,25 @@
-[project]
+[tool.poetry]
 name = "feddit-sentiment-microsite"
 version = "0.1.0"
 description = "Sentiment analysis microservice for Feddit comments"
-authors = [
-    {name = "Mateu Busquets",email = "mateu003@gmail.com"}
-]
-packages = [{ include = "app" }]
-license = {text = "MIT"}
+authors = ["Mateu Busquets <mateu003@gmail.com>"]
+license = "MIT"
 readme = "README.md"
-requires-python = ">=3.10"
-dependencies = [
-    "fastapi (>=0.115.12,<0.116.0)",
-    "uvicorn (>=0.34.3,<0.35.0)",
-    "httpx (>=0.28.1,<0.29.0)",
-    "logging (>=0.4.9.6,<0.5.0.0)",
-]
+packages = [{ include = "app" }]
+python = ">=3.10"
 
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.poetry.dependencies]
+python = ">=3.10"
+fastapi = ">=0.115.12,<0.116.0"
+uvicorn = ">=0.34.3,<0.35.0"
+httpx = ">=0.28.1,<0.29.0"
+logging = ">=0.4.9.6,<0.5.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
 ruff = "^0.11.12"
 pre-commit = "^4.2.0"
 pytest-asyncio = "^1.0.0"
-
 
 [tool.poetry.group.ml.dependencies]
 vadersentiment = "^3.3.2"
@@ -41,3 +34,7 @@ line-length = 88
 [tool.ruff.lint]
 select = ["E", "F"]
 ignore = ["E501"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
