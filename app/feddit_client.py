@@ -1,4 +1,5 @@
 import logging
+from app.sentiment import analyze_sentiment
 
 import httpx
 
@@ -74,6 +75,26 @@ async def get_comments(subfeddit: str, limit: int = 25) -> list[dict]:
         )
         raise
 
-    comments = response.json()
+    comments = response.json()["comments"]
+    comments = extract_text_and_id(comments)
+
+    for c in comments:
+        sentiment = analyze_sentiment(c["text"])
+        c["polarity"] = sentiment["polarity"]
+        c["classification"] = sentiment["classification"]
+
     logger.info(f"Retrieved {len(comments)} comments from subfeddit '{subfeddit}'")
     return comments
+
+
+def extract_text_and_id(comments: list[dict]) -> list[dict]:
+    """
+    Extract only the ID and text from a list of comment dictionaries.
+
+    Args:
+        comments (list[dict]): The full list of comments returned by Feddit.
+
+    Returns:
+        list[dict]: A simplified list with only 'id' and 'text' fields.
+    """
+    return [{"id": c["id"], "text": c["text"]} for c in comments]
