@@ -3,7 +3,8 @@ from httpx import Response, Request
 from app.feddit_client import (
     get_subfeddit_id_by_name,
     get_comments,
-    extract_text_and_id,
+    enrich_with_sentiment,
+    is_within_time_range,
 )
 import logging
 from json import dumps
@@ -150,10 +151,46 @@ async def test_get_comments(monkeypatch):
     logger.info("[TEST] test_get_comments: passed")
 
 
-def test_extract_text_and_id():
-    sample_input = [
-        {"id": "123", "text": "Great!", "created_at": 111, "username": "bob"},
-        {"id": "456", "text": "Awful!", "created_at": 112, "username": "alice"},
-    ]
-    expected = [{"id": "123", "text": "Great!"}, {"id": "456", "text": "Awful!"}]
-    assert extract_text_and_id(sample_input) == expected
+def test_enrich_with_sentiment(monkeypatch):
+    """
+    Test the enrichment of a comment with sentiment data.
+
+    This test mocks the sentiment analysis function to return a fixed result,
+    then checks that the `enrich_with_sentiment` function correctly adds the
+    'polarity' and 'classification' fields to the original comment.
+
+    Args:
+        monkeypatch (MonkeyPatch): Pytest fixture used to replace the actual
+            sentiment analyzer with a mock version.
+
+    Raises:
+        AssertionError: If the enriched comment does not contain the expected values.
+    """
+
+    def mock_analyze_sentiment(text):
+        return {"polarity": 0.5, "classification": "positive"}
+
+    monkeypatch.setattr("app.feddit_client.analyze_sentiment", mock_analyze_sentiment)
+
+    comment = {"id": "abc", "text": "Great job!"}
+    enriched = enrich_with_sentiment(comment)
+
+    assert enriched["id"] == "abc"
+    assert enriched["polarity"] == 0.5
+    assert enriched["classification"] == "positive"
+
+
+def test_is_within_time_range():
+    """
+    Test the `is_within_time_range` function with various timestamp boundaries.
+
+    This test ensures that the function correctly identifies whether a comment's
+    `created_at` timestamp falls within the given `start` and `end` boundaries.
+
+    Raises:
+        AssertionError: If the time range logic fails for any of the given cases.
+    """
+    comment = {"created_at": 1700000000}
+    assert is_within_time_range(comment, 1699999999, 1700000001)
+    assert not is_within_time_range(comment, 1700000001, None)
+    assert not is_within_time_range(comment, None, 1699999999)
