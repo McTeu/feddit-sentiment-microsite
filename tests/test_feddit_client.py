@@ -1,6 +1,10 @@
 import pytest
 from httpx import Response, Request
-from app.feddit_client import get_subfeddit_id_by_name, get_comments
+from app.feddit_client import (
+    get_subfeddit_id_by_name,
+    get_comments,
+    extract_text_and_id,
+)
 import logging
 from json import dumps
 
@@ -98,20 +102,25 @@ async def test_get_comments(monkeypatch):
         "app.feddit_client.get_subfeddit_id_by_name", mock_get_subfeddit_id_by_name
     )
 
-    mock_comments = [
-        {
-            "id": 1001,
-            "username": "mock_user_1",
-            "text": "Well done! Great effort.",
-            "created_at": 1627655936,
-        },
-        {
-            "id": 1002,
-            "username": "mock_user_2",
-            "text": "Could have been better...",
-            "created_at": 1627659536,
-        },
-    ]
+    mock_comments = {
+        "subfeddit_id": 2,
+        "limit": 25,
+        "skip": 0,
+        "comments": [
+            {
+                "id": 1001,
+                "username": "mock_user_1",
+                "text": "Well done! Great effort.",
+                "created_at": 1627655936,
+            },
+            {
+                "id": 1002,
+                "username": "mock_user_2",
+                "text": "Could have been better...",
+                "created_at": 1627659536,
+            },
+        ],
+    }
 
     async def mock_get(*args, **kwargs):
         logger.info("[MOCK] Returning mocked comments list")
@@ -134,7 +143,17 @@ async def test_get_comments(monkeypatch):
     monkeypatch.setattr("app.feddit_client.httpx.AsyncClient", lambda: MockClient())
 
     comments = await get_comments("cats")
+    logger.info(comments)
     logger.info(f"[ASSERT] Retrieved {len(comments)} comments")
     assert isinstance(comments, list)
     assert comments[0]["id"] == 1001
     logger.info("[TEST] test_get_comments: passed")
+
+
+def test_extract_text_and_id():
+    sample_input = [
+        {"id": "123", "text": "Great!", "created_at": 111, "username": "bob"},
+        {"id": "456", "text": "Awful!", "created_at": 112, "username": "alice"},
+    ]
+    expected = [{"id": "123", "text": "Great!"}, {"id": "456", "text": "Awful!"}]
+    assert extract_text_and_id(sample_input) == expected

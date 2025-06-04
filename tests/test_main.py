@@ -24,15 +24,15 @@ async def test_comments_endpoint_returns_200(monkeypatch):
         return [
             {
                 "id": 1001,
-                "username": "mock_user_1",
-                "text": "Well done! Great effort.",
-                "created_at": 1627655936,
+                "text": "I love this product!",
+                "polarity": 0.85,
+                "classification": "positive",
             },
             {
                 "id": 1002,
-                "username": "mock_user_2",
-                "text": "Could have been better...",
-                "created_at": 1627659536,
+                "text": "This is terrible and disappointing.",
+                "polarity": -0.8,
+                "classification": "negative",
             },
         ]
 
@@ -48,7 +48,7 @@ async def test_comments_endpoint_returns_200(monkeypatch):
     data = response.json()
     logger.info(f"[ASSERT] Response data: {data}")
     assert isinstance(data, list)
-    assert data[1]["text"] == "Could have been better..."
+    assert data[1]["polarity"] == -0.8
     logger.info("[TEST] test_comments_endpoint_returns_200: passed")
 
 
@@ -95,7 +95,7 @@ async def test_comments_endpoint_returns_500(monkeypatch):
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
-        response = await client.get("/comments/cats")
+        response = await client.get("/comments/Topic1")
 
     logger.info(f"[ASSERT] Status code: {response.status_code}")
     assert response.status_code == 500
