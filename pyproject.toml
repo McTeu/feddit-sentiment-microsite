@@ -6,7 +6,6 @@ authors = ["Mateu Busquets <mateu003@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 packages = [{ include = "app" }]
-python = ">=3.10"
 
 [tool.poetry.dependencies]
 python = ">=3.10"
