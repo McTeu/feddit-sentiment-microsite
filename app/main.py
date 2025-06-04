@@ -24,19 +24,24 @@ async def comments(
     ),
 ):
     """
-    Get the most recent comments from a given subfeddit with sentiment classification.
+    Retrieve a limited number of recent comments from a specific subfeddit,
+    along with their sentiment classification.
 
     Args:
-        subfeddit (str): The name (title) of the subfeddit to query.
+        subfeddit (str): Name of the subfeddit to query.
+        limit (int): Maximum number of comments to retrieve (default: 25, max: 100).
 
     Returns:
-        list[dict]: A list of comments including their id, text, polarity score,
-        and classification.
+        List[dict]: A list of comments, each including:
+            - id (str): Unique identifier of the comment
+            - text (str): Content of the comment
+            - polarity (float): Sentiment polarity score
+            - sentiment (str): Sentiment classification ("positive" or "negative")
 
     Raises:
         HTTPException:
-            - 404 if the subfeddit is not found.
-            - 500 for general internal errors.
+            404: If the subfeddit does not exist or returns no comments.
+            500: For any unexpected server error.
     """
     logger.info(f"Received request for comments from subfeddit: '{subfeddit}'")
 
