@@ -33,7 +33,7 @@ jobs:
           poetry show
 
       - name: Run Ruff (lint)
-        run: poetry run ruff .
+        run: poetry run ruff check .
 
       - name: Run Tests
         run: poetry run pytest
