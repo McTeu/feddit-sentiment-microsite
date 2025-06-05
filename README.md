@@ -26,14 +26,6 @@ A Python microservice for performing sentiment analysis on comments from the Fed
 poetry install
 ```
 
-## 🧪 Run the Microservice
-
-```bash
-poetry run uvicorn app.main:app
-```
-
-The API will be available at `http://localhost:8000`
-
 ## 📥 Example Usage
 
 1. **Start the Feddit API using Docker**:
@@ -47,8 +39,13 @@ Visit: [http://0.0.0.0:8080](http://0.0.0.0:8080)
 2. **Start the microservice**:
 
 ```bash
-poetry run uvicorn app.main:app --reload
+poetry run uvicorn app.main:app
 ```
+
+Make sure to run this command from the root directory of the project (where the `app/` folder is located).
+
+
+The API will be available at `http://localhost:8000`
 
 3. **Send a request**:
 
