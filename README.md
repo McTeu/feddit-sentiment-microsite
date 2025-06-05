@@ -62,19 +62,22 @@ You can also paste the URL directly into your browser.
 
 ### `GET /comments/{topic}`
 
-**Query Parameters:**
+**Query Parameters**
 
 * `limit`: Maximum number of comments to return
 * `start`: ISO timestamp to filter from (optional)
 * `end`: ISO timestamp to filter to (optional)
 * `sort_by_polarity_score`: `asc` or `desc` (optional)
 
-**Available Subfeddits:**
+**Available Subfeddits**
+
 The Feddit API includes the following predefined subfeddits (topics):
 * Dummy Topic 1
 * Dummy Topic 2
 * Dummy Topic 3
+
 When using them in URLs (e.g. via curl or browser), make sure to encode spaces as '%20'. For example:
+
 ```bash
 curl "http://localhost:8000/comments/Dummy%20Topic%201"
 ```
