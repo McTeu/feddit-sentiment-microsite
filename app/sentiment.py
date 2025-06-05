@@ -13,7 +13,7 @@ def analyze_sentiment(text: str) -> dict:
         text (str): The comment text to analyze.
 
     Returns:
-        dict: A dictionary containing the polarity score (compound) and the
+        dict: A dictionary containing the polarity score and the
               sentiment classification (positive, negative).
     """
     if not text or not text.strip():
